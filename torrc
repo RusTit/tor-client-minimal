@@ -22,3 +22,7 @@ KeepalivePeriod 60
 NewCircuitPeriod 15                                                                                                                       
 # How many entry guards should we keep at a time?                                                                                           
 NumEntryGuards 8  
+
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+# Place bridges here
+UseBridges 1
