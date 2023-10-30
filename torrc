@@ -1,18 +1,22 @@
 ## The directory for keeping all the keys/etc
-DataDirectory /var/lib/tor
+# DataDirectory /var/lib/tor
 
 ## Tor opens a socks proxy on port 9150
 SocksPort 0.0.0.0:9150
+# SOCKSPort 9150
+# DNSPort 5353
+# TransPort 9040
 
 ## Entry policies to allow/deny SOCKS requests based on IP address.
-## SocksPolicy accept 192.168.1.0/24
-SocksPolicy accept 172.17.0.0/16
-SocksPolicy reject *
+# SocksPolicy accept 192.168.1.0/24
+# SocksPolicy accept 172.17.0.0/16
+# SocksPolicy reject *
+SocksPolicy accept *
 
 ## Logs go to stdout at level "notice"
 Log notice stdout
 
-ControlPort 9051
+# ControlPort 9051
 
 # Try for at most NUM seconds when building circuits. If the circuit isn't open in that time, give up on it. (Default: 1 minute.)           
 CircuitBuildTimeout 5                                                                                                                       
@@ -23,6 +27,11 @@ NewCircuitPeriod 15
 # How many entry guards should we keep at a time?                                                                                           
 NumEntryGuards 8  
 
-ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
-# Place bridges here
+ClientTransportPlugin obfs4 exec /usr/bin/lyrebird
+
+# Bridge obfs4 1.2.3.4 36B520dA99BB4 cert=z7d5SQIR6hqgdEbs1qanbvAdzn/E9hdGHQ iat-mode=0
+
+#ClientUseIPv6 1
+# ClientPreferIPv6ORPort 1
+
 UseBridges 1
