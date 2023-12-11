@@ -7,6 +7,7 @@ Tor client (Socks proxy ) version 0.4.8.10-r0 image - Tor client image qualified
 OS : Alpine Linux Latest - [http://alpinelinux.org](http://alpinelinux.org) - Alpine Linux is a security-oriented, lightweight Linux distribution based on musl libc and busybox.
 
 Tor : version 0.4.8.10-r0
+Lyrebird: version 0.1.0-r2
 
 ### Install
 
