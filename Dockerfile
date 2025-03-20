@@ -1,9 +1,8 @@
-FROM alpine:latest
+FROM alpine:edge
 
 RUN apk update \
  && apk upgrade \
- && apk add --no-cache tor \
- && apk add --no-cache lyrebird --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+ && apk add --no-cache tor lyrebird \
  && rm /var/cache/apk/*
 
 EXPOSE 9150
