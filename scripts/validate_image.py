@@ -71,13 +71,11 @@ def get_processed_readme_lines(index_blocks: list[str]) -> list[str]:
             elif is_packages_block and "---" in line:
                 is_packages_block = False
 
-            if not is_packages_block:
-                result.append(line)
-            else:
+            if is_packages_block:
                 m = line_re.match(line)
                 if m:
                     line = create_package_version_line(m, index_blocks)
-                result.append(line)
+            result.append(line)
 
     return result
 
