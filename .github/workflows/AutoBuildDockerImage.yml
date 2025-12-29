@@ -2,7 +2,7 @@ name: Auto build docker image
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # раз в день
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +26,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests        
 
       - name: Run script
         run: |

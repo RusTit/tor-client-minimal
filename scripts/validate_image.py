@@ -1,13 +1,17 @@
 import logging
 import tarfile
 import io
+import re
 import requests
 from typing import Final, Optional
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-INDEX_URL: Final[str] = "https://dl-cdn.alpinelinux.org/alpine/edge/community/x86_64/APKINDEX.tar.gz"
+INDEX_URL: Final[str] = (
+    "https://dl-cdn.alpinelinux.org/alpine/edge/community/x86_64/APKINDEX.tar.gz"
+)
+
 
 def get_index():
     url = INDEX_URL
@@ -23,28 +27,67 @@ def get_index():
         index = tar.extractfile("APKINDEX").read().decode()
     return index
 
+
 def get_version(pkg_name, blocks) -> Optional[str]:
+    logger.debug(f"Looking up package {pkg_name}")
     for b in blocks:
         if f"P:{pkg_name}\n" in b:
             for line in b.splitlines():
                 if line.startswith("V:"):
                     return line[2:]
+    logger.debug(f"No version found for {pkg_name}")
     return None
 
-def get_readme_content() -> list[str]:
+
+README_FILENAME: Final[str] = "README.md"
+
+
+def get_processed_readme_lines(index_blocks) -> list[str]:
     result: list[str] = []
+    line_re = re.compile(
+        r"^- \*\*(?P<name>[a-zA-Z0-9._+-]+):\*\*\s+`(?P<version>[^`]+)`$"
+    )
     is_packages_block = False
-    with open("README.md", "r") as fh:
-        line = fh.readline()
+    with open(README_FILENAME, "r") as fh:
+        for line in fh:
+            if "Versions" in line:
+                is_packages_block = True
+            elif is_packages_block and line == "---":
+                is_packages_block = False
+
+            if not is_packages_block:
+                result.append(line)
+            else:
+                m = line_re.match(line)
+                if not m:
+                    result.append(line)
+                else:
+                    package_name = m.group("name")
+                    package_version = m.group("version")
+                    logger.info(f"Package {package_name} version {package_version}")
+                    package_version_in_index = get_version(package_name, index_blocks)
+                    if package_version != package_version_in_index:
+                        logger.info(
+                            f"Version {package_version} does not match version {package_version_in_index}"
+                        )
+                        package_version = package_version_in_index
+                    line = f"- **{package_name}:** `{package_version}`\n"
+                    result.append(line)
 
     return result
+
+
+def save_readme_lines(readme_lines: list[str]) -> None:
+    with open(README_FILENAME, "w", encoding="utf-8") as fh:
+        fh.writelines(readme_lines)
+
 
 def main() -> None:
     logger.info("Starting validation")
     index = get_index()
     blocks = index.split("\n\n")
-    tor_version = get_version("tor", blocks)
-    lyrebird_version = get_version("lyrebird", blocks)
+    readme_lines = get_processed_readme_lines(blocks)
+    save_readme_lines(readme_lines)
     logger.info("Validation finished")
 
 
