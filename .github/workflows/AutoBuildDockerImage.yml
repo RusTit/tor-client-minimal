@@ -36,16 +36,37 @@ jobs:
         run: |
           python scripts/validate_image.py
 
-      - name: Commit & push if changed
+      - name: Check for changes
+        id: changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           if git diff --quiet; then
-            echo "No changes"
-            exit 0
-          fi
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi          
 
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        run: |
+          VERSION=$(date -u '+%Y%m%d%H%M')
+          echo "Docker version tag: $VERSION"
+          docker build --no-cache -t rustit/tor_client_minimal .
+          docker tag rustit/tor_client_minimal:latest rustit/tor_client_minimal:$VERSION
+          docker push rustit/tor_client_minimal:$VERSION
+          docker push rustit/tor_client_minimal:latest
+
+      - name: Commit & push changes
+        if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        run: |
           git add .
           git commit -m "Auto update: $(date -u '+%Y-%m-%d')"
           git push
