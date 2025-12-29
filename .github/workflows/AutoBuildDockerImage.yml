@@ -55,7 +55,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & push Docker image
-        if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        if: ${{ steps.changes.outputs.no_changes == 'true' }}
         run: |
           VERSION=$(date -u '+%Y%m%d%H%M')
           echo "Docker version tag: $VERSION"
