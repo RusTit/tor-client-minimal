@@ -92,6 +92,7 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: tor_client_minimal ${{ env.VERSION }}
           files: tor_client_minimal_${{ env.VERSION }}.tar.gz
+          body_path: changes.md
 
       - name: Telegram notification
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
