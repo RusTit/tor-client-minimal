@@ -57,13 +57,34 @@ jobs:
 
       - name: Build & push Docker image
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        env:
+          IMAGE_NAME: rustit/tor_client_minimal
         run: |
           VERSION=$(date -u '+%Y%m%d%H%M')
-          echo "Docker version tag: $VERSION"
-          docker build --no-cache -t rustit/tor_client_minimal .
-          docker tag rustit/tor_client_minimal:latest rustit/tor_client_minimal:$VERSION
-          docker push rustit/tor_client_minimal:$VERSION
-          docker push rustit/tor_client_minimal:latest
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+          docker build --no-cache -t $IMAGE_NAME:latest .
+          docker tag $IMAGE_NAME:latest $IMAGE_NAME:$VERSION
+
+          docker push $IMAGE_NAME:$VERSION
+          docker push $IMAGE_NAME:latest
+
+          docker save $IMAGE_NAME:latest -o tor_client_minimal_${VERSION}.tar
+
+      - name: Upload Docker image artifact
+        if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: tor_client_minimal_${{ env.VERSION }}
+          path: tor_client_minimal_${{ env.VERSION }}.tar
+
+      - name: Upload image to GitHub Release
+        if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: tor_client_minimal ${{ env.VERSION }}
+          files: tor_client_minimal_${{ env.VERSION }}.tar
 
       - name: Commit & push changes
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
