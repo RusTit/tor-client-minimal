@@ -52,7 +52,7 @@ def create_package_version_line(m: Match[str], index_blocks: list[str]) -> str:
         raise RuntimeError(f'package version "{package_name}" not found!')
     if package_version != package_version_in_index:
         logger.info(
-            f'Version "{package_version}" does not match version "{package_version_in_index}"'
+            f'Version "{package_version}" does not match version in index "{package_version_in_index}"'
         )
         package_version = package_version_in_index
     return f"- **{package_name}:** `{package_version}`\n"
