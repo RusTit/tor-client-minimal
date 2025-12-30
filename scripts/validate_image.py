@@ -30,13 +30,13 @@ def get_index() -> str:
 
 
 def get_version(pkg_name: str, blocks: list[str]) -> Optional[str]:
-    logger.debug(f"Looking up package {pkg_name}")
+    logger.debug(f'Looking up package "{pkg_name}"')
     for b in blocks:
         if f"P:{pkg_name}\n" in b:
             for line in b.splitlines():
                 if line.startswith("V:"):
                     return line[2:]
-    logger.warning(f"No version found for {pkg_name}")
+    logger.warning(f'No version found for "{pkg_name}"')
     return None
 
 
@@ -46,13 +46,13 @@ README_FILENAME: Final[str] = "README.md"
 def create_package_version_line(m: Match[str], index_blocks: list[str]) -> str:
     package_name = m.group("name")
     package_version = m.group("version")
-    logger.info(f"Package {package_name} version {package_version}")
+    logger.info(f'Package "{package_name}" version "{package_version}"')
     package_version_in_index = get_version(package_name, index_blocks)
     if package_version_in_index is None:
-        raise RuntimeError(f"package version {package_name} not found!")
+        raise RuntimeError(f'package version "{package_name}" not found!')
     if package_version != package_version_in_index:
         logger.info(
-            f"Version {package_version} does not match version {package_version_in_index}"
+            f'Version "{package_version}" does not match version "{package_version_in_index}"'
         )
         package_version = package_version_in_index
     return f"- **{package_name}:** `{package_version}`\n"
