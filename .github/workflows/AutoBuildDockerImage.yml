@@ -85,8 +85,8 @@ jobs:
           push: true
           pull: true
           tags: |
-            rustit/tor_client_minimal:latest
             rustit/tor_client_minimal:${{ env.VERSION }}
+            rustit/tor_client_minimal:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
