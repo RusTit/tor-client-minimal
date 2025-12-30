@@ -48,6 +48,13 @@ jobs:
             echo "no_changes=false" >> $GITHUB_OUTPUT
           fi          
 
+      - name: Commit & push changes
+        if: ${{ steps.changes.outputs.no_changes == 'false' }}
+        run: |
+          git add .
+          git commit -m "Auto update: $(date -u '+%Y-%m-%d')"
+          git push
+
       - name: Log in to DockerHub
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
         uses: docker/login-action@v3
@@ -85,13 +92,6 @@ jobs:
           tag_name: ${{ env.VERSION }}
           name: tor_client_minimal ${{ env.VERSION }}
           files: tor_client_minimal_${{ env.VERSION }}.tar
-
-      - name: Commit & push changes
-        if: ${{ steps.changes.outputs.no_changes == 'false' }}
-        run: |
-          git add .
-          git commit -m "Auto update: $(date -u '+%Y-%m-%d')"
-          git push
 
       - name: Telegram notification
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
