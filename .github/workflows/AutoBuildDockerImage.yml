@@ -76,14 +76,14 @@ jobs:
           docker push $IMAGE_NAME:$VERSION
           docker push $IMAGE_NAME:latest
 
-          docker save $IMAGE_NAME:latest -o tor_client_minimal_${VERSION}.tar
+          docker save $IMAGE_NAME:latest | gzip > tor_client_minimal_${VERSION}.tar.gz
 
       - name: Upload Docker image artifact
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
         uses: actions/upload-artifact@v4
         with:
           name: tor_client_minimal_${{ env.VERSION }}
-          path: tor_client_minimal_${{ env.VERSION }}.tar
+          path: tor_client_minimal_${{ env.VERSION }}.tar.gz
 
       - name: Upload image to GitHub Release
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
@@ -91,7 +91,7 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           name: tor_client_minimal ${{ env.VERSION }}
-          files: tor_client_minimal_${{ env.VERSION }}.tar
+          files: tor_client_minimal_${{ env.VERSION }}.tar.gz
 
       - name: Telegram notification
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
