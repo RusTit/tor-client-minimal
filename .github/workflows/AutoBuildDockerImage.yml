@@ -55,7 +55,13 @@ jobs:
         if: ${{ steps.changes.outputs.no_changes == 'false' }}
         run: |
           git add .
-          git commit -m "Auto update: $(date -u '+%Y-%m-%d')"
+          {
+            echo "# Auto update: $(date -u '+%Y-%m-%d')"
+            echo
+            echo
+            cat changes.md
+          } > /tmp/commit_message.txt
+          git commit -F /tmp/commit_message.txt
           git push
 
       # ---------- Docker ----------
