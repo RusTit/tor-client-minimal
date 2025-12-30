@@ -23,11 +23,11 @@ This Docker image:
   https://alpinelinux.org  
   > Alpine Linux is a security-oriented, lightweight Linux distribution based on musl libc and busybox.
 
-- **tor:** `test`
+- **tor:** `0.4.8.21-r0`
 
   https://gitlab.com/torproject/tor
 
-- **lyrebird:** `test`
+- **lyrebird:** `0.8.0-r0`
 
   https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird
 
