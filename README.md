@@ -19,7 +19,7 @@ This Docker image:
 
 ## 🧩 Versions
 
-- **OS:** Alpine Linux (latest)  
+- **OS:** Alpine Linux (latest edge)  
   https://alpinelinux.org  
   > Alpine Linux is a security-oriented, lightweight Linux distribution based on musl libc and busybox.
 
