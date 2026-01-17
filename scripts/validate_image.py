@@ -4,18 +4,36 @@ import io
 import re
 from re import Match
 import requests
-from typing import Final, Optional
+from typing import Final, Optional, Callable, TypeVar, ParamSpec
 from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor, Future
+from functools import wraps
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+executor = ThreadPoolExecutor(max_workers=4)
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def async_decorator(func: Callable[P, R]) -> Callable[P, Future[R]]:
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> Future[R]:
+        future = executor.submit(func, *args, **kwargs)
+        return future
+
+    return wrapper
+
 
 INDEX_URL: Final[str] = (
     "https://dl-cdn.alpinelinux.org/alpine/edge/community/x86_64/APKINDEX.tar.gz"
 )
 
 
-def get_index() -> str:
+@async_decorator
+def get_index() -> list[str]:
     url = INDEX_URL
     logger.debug(f"Fetching index from {url}")
 
@@ -27,7 +45,7 @@ def get_index() -> str:
     logger.debug("Parsing index")
     with tarfile.open(fileobj=io.BytesIO(resp.content), mode="r:gz") as tar:
         index = tar.extractfile("APKINDEX").read().decode()
-    return index
+    return index.split("\n\n")
 
 
 def get_version(pkg_name: str, blocks: list[str]) -> Optional[str]:
@@ -71,7 +89,7 @@ def create_package_version_line(
 
 
 def get_processed_readme_lines(
-    index_blocks: list[str],
+    blocks_future: Future[list[str]],
 ) -> tuple[list[str], list[Change]]:
     logger.debug("Processing readme")
     result: list[str] = []
@@ -90,6 +108,7 @@ def get_processed_readme_lines(
             if is_packages_block:
                 m = line_re.match(line)
                 if m:
+                    index_blocks = blocks_future.result()
                     line, change = create_package_version_line(m, index_blocks)
                     if change:
                         changes.append(change)
@@ -120,9 +139,8 @@ def save_changes(changes: list[Change]) -> None:
 
 def main() -> None:
     logger.info("Starting validation")
-    index = get_index()
-    blocks = index.split("\n\n")
-    readme_lines, changes = get_processed_readme_lines(blocks)
+    blocks_future = get_index()
+    readme_lines, changes = get_processed_readme_lines(blocks_future)
     save_readme_lines(readme_lines)
     save_changes(changes)
     logger.info("Validation finished")
