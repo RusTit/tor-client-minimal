@@ -27,7 +27,7 @@ This Docker image:
 
   https://gitlab.com/torproject/tor
 
-- **lyrebird:** `0.8.1-r0`
+- **lyrebird:** `0.8.1-r1`
 
   https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird
 
