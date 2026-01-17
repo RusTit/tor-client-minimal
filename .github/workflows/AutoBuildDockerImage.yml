@@ -90,6 +90,7 @@ jobs:
           context: .
           push: true
           pull: true
+          no-cache: true
           tags: |
             rustit/tor_client_minimal:${{ env.VERSION }}
             rustit/tor_client_minimal:latest
