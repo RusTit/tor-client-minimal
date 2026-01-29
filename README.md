@@ -23,7 +23,7 @@ This Docker image:
   https://alpinelinux.org  
   > Alpine Linux is a security-oriented, lightweight Linux distribution based on musl libc and busybox.
 
-- **tor:** `0.4.8.21-r0`
+- **tor:** `0.4.8.22-r0`
 
   https://gitlab.com/torproject/tor
 
